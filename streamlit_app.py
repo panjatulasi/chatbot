@@ -1,5 +1,11 @@
 import streamlit as st
-from openai import OpenAI
+import openai
+
+openai.api_type = "azure"
+openai.api_base = 'https://manual-verifications.openai.azure.com/'
+openai.api_version = '2024-02-15-preview'
+openai.api_key = 'af2f87a171e44621b7c5dfce83ce1010'
+
 # Show title and description.
 st.title("💬 Chatbot")
 st.write(
@@ -17,7 +23,7 @@ if not openai_api_key:
 else:
 
     # Create an OpenAI client.
-    client = OpenAI(api_key=openai_api_key)
+    # client = OpenAI(api_key=openai_api_key)
 
     # Create a session state variable to store the chat messages. This ensures that the
     # messages persist across reruns.
@@ -39,14 +45,18 @@ else:
             st.markdown(prompt)
 
         # Generate a response using the OpenAI API.
-        stream = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
+        stream = openai.ChatCompletion.create(
+        engine='rv-ai-service',
+        temperature=0.0,
+        max_tokens=4096,
+        top_p=0.95,
+        frequency_penalty=0,
+        presence_penalty=0,
+        messages=[
                 {"role": m["role"], "content": m["content"]}
                 for m in st.session_state.messages
             ],
-            stream=True,
-        )
+        stream=True)
 
         # Stream the response to the chat using `st.write_stream`, then store it in 
         # session state.
